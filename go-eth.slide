@@ -1,0 +1,177 @@
+Hacking Ethereum with Go
+Part 2: Go and Geth API
+4 Jul 2017
+Tags: Ethereum, Solidity, Smart Contracts
+
+Roberet Zaremba
+http://scale-it.pl
+
+
+* Credits
+
+Code and examples by Dave Appleton
+Blockchain Developer, HelloGold
+
+
+
+* Ethereum
+- The nodes are not just accounting machines
+- A transaction does not JUST have to transfer value
+- A transaction can *POST* a _contract_ *
+- Another transaction can *call* that contract
+- Just like you *could* post a script and have it delivered to a script folder on a server
+- Ethereum becomes a distributed computer
+- code is compiled into byte code
+- byte code is placed on the blockchain
+- every node has a Virtual Machine (byte code interpreter)
+- users of the contract need to know the available entry points
+
+  * kinda like code injection
+
+
+* What is a contract?
+- bytecode
+- called a bit like RPC
+- like any program in that it has
+-- instance data that is persistent
+-- methods with parameters and local data
+-- constructors
+-- it can hold value (ETH or tokens)
+-- it can send and receive ETH or tokens
+-- it is executed by *every* node to get consensus
+
+Consensus is the agreement on the transactions.
+
+The effect is that the internal state of each node will be the same.
+
+
+* Let's make up a problem...
+
+.image smart_meter.jpg
+
+* Building a Contract
+
+	pragma solidity ^0.4.10;
+
+	contract PowerToken {
+		... storage declarations
+
+		... methods & constructor
+	}
+
+Data structures in the contract:
+
+.code PowerTokenPresent.sol  /start fa OMIT/,/end fa OMIT/
+
+* The Constructor
+
+.code PowerTokenPresent.sol  /start constructor OMIT/,/end constructor OMIT/
+
+* setup, enquiry and paying the bill
+
+.code PowerTokenPresent.sol  /start cs OMIT/,/end cs OMIT/
+
+.code PowerTokenPresent.sol  /start balance OMIT/,/end balance OMIT/
+
+.code PowerTokenPresent.sol  /start xfer OMIT/,/end xfer OMIT/
+
+What are MustBeTech & MustBeTeller ?
+
+
+* Modifiers
+
+Modifiers are an easy way to add a prefix to a function for code reuse.
+
+"throw" causes the transaction to be terminated and changes rolled back.
+
+.code PowerTokenPresent.sol  /start mod OMIT/,/end mod OMIT/
+
+* Events
+
+Events put data into the log (along with the recorded transaction) and can be detected by event handlers in wallets etc. Example event:
+
+   event purchase(address user, uint16 level, uint256 value, uint256 tokens);
+
+.image events.png 300 1000
+
+* Updating the readings
+
+.code PowerTokenPresent.sol  /start basic OMIT/,/end basic OMIT/
+
+
+* Interfacing with the Ethereum
+
+Interacting with a contract on the Ethereum blockchain from is possible via the RPC interfaces exposed by Ethereum clients. However, writing the boilerplate code that translates our *decent* Go language constructs into RPC calls and back is extremely time consuming and also extremely brittle: implementation bugs can only be detected during runtime and it's almost impossible to evolve a contract as even a tiny change in Solidity can be painful to port over to Go.
+
+`geth` introduces `abigen` a source code generator that can convert Ethereum ABI definitions into easy to use, (compile time) type-safe Go packages.
+It operates on plain Ethereum contract ABIs with expanded functionality if the contract bytecode is also available. However it also accepts Solidity source files, making development much more streamlined.
+
+
+* How to use it?
+
+- clone github.com/etherum/go-ethereum into GOPATH
+- run make
+- run
+    abigen --sol=Power.sol --pkg=main --out=power.go
+
+
+* Power contract interface
+
+Once we run `abigen` on our `Power` contract, abigen builds a complete interface for talking to the contract.
+
+.code power.go /start deploy OMIT/,/end deploy OMIT/
+
+
+
+* Create and deploy contract
+
+You need to provide the your private key:
+
+.code test.go  /start deploy OMIT/,/end deploy OMIT/
+
+
+* Let's talk to the contract
+
+- make calls
+
+.code test.go  /start bal OMIT/,/end bal OMIT/
+
+- and transactions
+
+.code test.go  /start pay OMIT/,/end pay OMIT/
+
+
+* Bonus: go generate
+
+`abigen` is bundeld together with `geth` - first class support from the Ethereum Geth team!
+
+It was made in such a way as to play beautifully together with existing Go toolchains: instead of having to remember the exact command needed to bind an Ethereum contract into a Go project, we can leverage `go generate`.
+
+Place the binding generation command into a Go source file before the package definition:
+
+    //go:generate abigen --sol PowerToken.sol --pkg main --out power.go
+
+Now, whenever the Solidity contract is modified, `go` will automatically generate the bindings for us.
+
+* using etherscan
+
+.image etherscan.png 500 800
+
+* record of transactions
+
+.image txlist.png 500 800
+
+* Summary
+
+Blockchain
+
+- An immutable record system
+- Role restricted activities
+- Records that cannot be forged
+- Publicly auditable data
+
+Geth `abigen`
+
+- type safe smart contracts interaction and management
+
+using an easily available infrastructure with minimal setup.
