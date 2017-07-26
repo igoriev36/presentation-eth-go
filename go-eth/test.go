@@ -12,18 +12,25 @@ import (
 )
 
 //start deploy OMIT
-func ownerTx(file string, password string) (res *bind.TransactOpts) {
+func ownerTx(pkFile string, password string) (res *bind.TransactOpts) {
 	// note: remember to check the errors!
-	kr, _ := os.Open(file)
-	res, _ = bind.NewTransactor(kr, password)
+	kr, err := os.Open(pkFile)
+	if err != nil {
+		panic(err)
+	}
+	if res, err = bind.NewTransactor(kr, password); err != nil {
+		panic(err)
+	}
 	return
 }
 
 func deploy() *Power {
 	var teller, tech common.Address
-	endPoint := "/Users/daveappleton/Library/Ethereum/geth.ipc"
+	endPoint := "http://localhost:10001"
 	client, _ := ethclient.Dial(endPoint)
-	_, _, power, _ = DeployPower(ownerTx("owner.json", "password1"), client, teller, tech)
+	tx := ownerTx("owner.json", "password")
+	_, _, power, _ := DeployPower(tx, client, teller, tech)
+	fmt.Println("PowerContract", power)
 	return power
 }
 
@@ -44,3 +51,7 @@ func payBill(contract *Power, user common.Address, amount *big.Int) {
 }
 
 //end pay OMIT
+
+func main() {
+	deploy()
+}

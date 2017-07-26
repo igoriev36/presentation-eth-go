@@ -5,12 +5,17 @@ Part 1: Introduction to Go
 Roberet Zaremba
 http://scale-it.pl
 
+* Preface
+
+Why I want to introduce Go?
+
+Because of *Design*.
 
 * Dichotomy
 
 Fast to write _or_ fast to execute. Why not both?
 
-.image triangle.png 400 _
+.image go-intro/triangle.png 400 _
 
 
 * Programming observations
@@ -21,14 +26,16 @@ Fast to write _or_ fast to execute. Why not both?
 - Languages become products in the long run
 - CPUs are shipping with more and more cores
 - Fast development cycle can lead to complex setups
+- Maintenance matters
 
 
 * How does Go fill the niche?
 
-Go aims to combine the safety and performance of a
-statically typed compiled language with the expressiveness
-and convenience of a dynamically typed interpreted
-language.
+[Russ Cox:] We want to make programmers more effective at managing two kinds of scale:
+
+- production scale, especially concurrent systems interacting with many other servers, exemplified today by cloud software;
+- development scale, especially large codebases worked on by many engineers coordinating only loosely, exemplified today by modern open-source development.
+
 
 
 * How does Go fill the niche?
@@ -43,15 +50,15 @@ Programming problems (and complexity) solved by *DESIGN*!
 _Consensus_drove_the_design._Nothing_went_into_the_language_until_all_agreed_that_it_was_right._Some_features_didn’t_get_resolved_until_after_a_year_or_more_of_discussion._
 -- Rob Pike
 
-.image gopher.png 200 _
+.image go-intro/gopher.png 200 _
 
 * How does Go fill the niche? [2]
 
 - Compiled (fast!)
 - Safety
-    - Statically typed
-    - Garbage collected
-    - Built-in concurrency
+-- Statically typed
+-- Garbage collected
+-- Built-in concurrency
 
 - No inheritance
 - Structured (packages)
@@ -62,35 +69,49 @@ _Consensus_drove_the_design._Nothing_went_into_the_language_until_all_agreed_tha
 
 Tools by *design*
 
-- godoc
-- gofmt
-- go_test
-- go_test_-bench=.
-- go vet (logical check)
-- race detector (eg `go test -race`)
+- `godoc`
+- `gofmt`
+- `go`test`
+- `go`test`-bench=.`
+- `go`vet` (logical check)
+- race detector (`go`test`-race`)
 
 and many more ...
 
 * Who is using Go?
 
-.image go-users.jpg
+.image go-intro/go-users.jpg
 
 * Who is using Go?
 
 Many companies are moving (or moved) their core services to Go:
 
-- Google (Download, and thousends "private")
+- Google (Download, Vitess, Kubernetes, Chrome and thousends "private" projectes)
+- Docker
 - Sendgrid - [[https://sendgrid.com/blog/convince-company-go-golang/][How to Convince Your Company to Go With Golang]]
 - Uber [[https://eng.uber.com/go-geofence/][How We Built Uber Engineering’s Highest Query per Second Service Using Go]]
-- Cloudflare ([[https://developers.soundcloud.com/blog/go-at-soundcloud][Railgun]] - speeds up the back haul between CF data centers and thier clients' servers)
+- Cloudflare: [[https://developers.soundcloud.com/blog/go-at-soundcloud][Railgun]] boost the back haul between CF data centers and clients' servers
 - [[https://www.youtube.com/watch?v=JOx9enktnUM&list=PLtLJO5JKE5YALxdnGgvgwxTSmANOvyAo9&index=2][Go at Dropbox]]
 - [[https://developers.soundcloud.com/blog/go-at-soundcloud][Go at SoundCloud]]
 - Bitly [[http://word.bitly.com/post/29550171827/go-go-gadget][Go Go Gadget]]
 - Twitter [[https://blog.twitter.com/engineering/en_us/a/2015/handling-five-billion-sessions-a-day-in-real-time.html][Handling five billion sessions a day – in real time]]
 - Digitalocean
-- Facebook
+- Facebook (Parse ...)
 - Hailo
 
+* The State of Developer Ecosystem in 2017
+
+[[https://www.jetbrains.com/research/devecosystem-2017/][JetBrains (Intellij creators)]]: In late 2016 and early 2017 we polled over 5,000 developers to identify the State of Developer Ecosystem. Here's what we learned.
+
+.image go-intro/prog-lang-survey-key-takeways.png
+
+* StackOverflow 2017 survey
+
+[[https://insights.stackoverflow.com/survey/2017#most-loved-dreaded-and-wanted][Most Loved, Dreaded, and Wanted]]
+
+.image go-intro/prog-lang-survey-most-wanted.png
+
+.caption https://insights.stackoverflow.com/survey/2017#most-loved-dreaded-and-wanted
 
 * Types
 
@@ -234,9 +255,9 @@ The `go` statement:
 `ExecuteJob` is now running in the background. But we don't know when it's finished!
 
 
-* Concurrency & Channels
+* Did I mention that concurrency is part of Go design?
 
-.play go-intro-workers.go /START OMIT/,/END OMIT/
+.play go-intro/workers.go /START OMIT/,/END OMIT/
 
 .link https://blog.golang.org/pipelines More - pipelines examples
 

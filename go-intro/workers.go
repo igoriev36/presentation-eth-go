@@ -43,7 +43,6 @@ func main() {
 	for i := 0; i < 8; i++ {
 		go DoWork(i, c)
 	}
-
 	for _, w := range wordList {
 		c <- w
 	}
